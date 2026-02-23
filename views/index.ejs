@@ -120,15 +120,27 @@
                 </div>
 
                 <div class="lobby-actions">
-                    <button class="premium-btn w-100 mb-3" onclick="startComputerGame()">VS COMPUTER</button>
-                    <button class="premium-btn w-100 mb-3 secondary-btn" onclick="startGame('quick')">QUICK PLAY
-                        ONLINE</button>
+                    <p class="lobby-group-title">👤 SOLO PLAY</p>
+                    <button class="premium-btn w-100" onclick="startComputerGame()">
+                        <span class="btn-icon">🤖</span> VS COMPUTER
+                    </button>
 
+                    <p class="lobby-group-title">⚔️ BATTLE ONLINE</p>
+                    <button class="premium-btn w-100 secondary-btn" onclick="startGame('quick')">
+                        <span class="btn-icon">🌐</span> QUICK PLAY
+                    </button>
+                    <button class="premium-btn w-100 dark-btn"
+                        onclick="alert('🏆 Tournament Mode coming soon in next update!')" style="opacity: 0.7;">
+                        <span class="btn-icon">🏆</span> TOURNAMENT (BETA)
+                    </button>
+
+                    <p class="lobby-group-title">🔐 PRIVATE ARENA</p>
                     <div class="private-match-section mb-4">
-                        <p class="text-muted small mb-2">OR JOIN A PRIVATE MATCH</p>
-                        <input type="text" id="roomCode" class="custom-input mb-2" placeholder="Room Code"
+                        <input type="text" id="roomCode" class="custom-input mb-2" placeholder="Enter Room Code"
                             style="text-align: center;">
-                        <button class="premium-btn w-100 dark-btn" onclick="startGame('private')">JOIN PRIVATE</button>
+                        <button class="premium-btn w-100 dark-btn" onclick="startGame('private')">
+                            <span class="btn-icon">🔑</span> JOIN PRIVATE
+                        </button>
                     </div>
 
                     <div class="compact-leaderboard">
@@ -137,6 +149,14 @@
                             <!-- Leaderboard injected here -->
                         </div>
                     </div>
+
+                    <div class="compact-leaderboard mt-4">
+                        <p class="text-muted small mb-2">📜 RECENT BATTLES</p>
+                        <div id="matchHistory" class="stat-grid-mini">
+                            <!-- Match history injected here -->
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
@@ -159,6 +179,20 @@
             <h1 id="winner" class="mb-4">YOU WON!</h1>
             <button onclick="shareResults()" class="premium-btn w-100 mb-3 secondary-btn">SHARE RESULTS 🚀</button>
             <button onclick="location.reload()" class="premium-btn w-100">BACK TO LOBBY</button>
+        </div>
+    </section>
+
+    <!-- NEW: Tutorial Modal -->
+    <section id="tutorialOverlay" style="display: none;">
+        <div class="modal-content-custom glass-panel">
+            <h1 class="main-title mb-3">HOW TO PLAY</h1>
+            <div class="tutorial-step mb-4">
+                <p class="mb-2">1️⃣ Enter your <b>Battle Name</b> to save your legend.</p>
+                <p class="mb-2">2️⃣ Select a <b>Game Mode</b> (Solo, Quick Match, or Private).</p>
+                <p class="mb-2">3️⃣ Each match has <b>20 Rounds</b>. First to win more rounds is the Champion!</p>
+                <p class="mb-2">4️⃣ Watch the <b>Glow-Timer</b>: Move fast or the AI decides for you!</p>
+            </div>
+            <button onclick="closeTutorial()" class="premium-btn w-100">GOT IT, LETS BATTLE! 🤜</button>
         </div>
     </section>
 

@@ -39,9 +39,10 @@ let isComputerMatch = false;
 function startComputerGame() {
   isComputerMatch = true;
   myName = document.getElementById("n1").value.trim() || "PLAYER";
+  localStorage.setItem("battleName", myName); // Save name
   document.getElementById("overlay").style.display = "none";
   document.getElementById("gameSection").style.display = "flex";
-  document.getElementById("roomDisplay").innerText = "MODE: VS COMPUTER";
+  document.getElementById("roomDisplay").querySelector("span").innerText = "MODE: VS COMPUTER";
 
   // Hide chat for computer matches
   const chatSidebar = document.getElementById("chatSidebar");
@@ -69,6 +70,7 @@ function startGame(mode) {
     alert("Please enter your name!");
     return;
   }
+  localStorage.setItem("battleName", myName); // Save name
 
   // Restore chat for online matches
   const chatSidebar = document.getElementById("chatSidebar");
@@ -337,6 +339,16 @@ function handleResult({ choices, winner, scores, round }) {
   }
 
   updateStreakUI();
+
+  // New: Winner Score VFX
+  if (winner === myLocalIndex) {
+    score1Display.classList.add("winner-flash");
+    setTimeout(() => score1Display.classList.remove("winner-flash"), 600);
+  } else if (winner !== -1) {
+    score2Display.classList.add("winner-flash");
+    setTimeout(() => score2Display.classList.remove("winner-flash"), 600);
+  }
+
   animateValue(score1Display, parseInt(score1Display.innerText), scores[0], 500);
   animateValue(score2Display, parseInt(score2Display.innerText), scores[1], 500);
 
@@ -360,8 +372,43 @@ function handleResult({ choices, winner, scores, round }) {
   }, 2500);
 }
 
+function saveMatchResult(winner, s1, s2, mode) {
+  let history = JSON.parse(localStorage.getItem("matchHistory") || "[]");
+  const newMatch = {
+    mode: mode,
+    result: winner === myName ? "WIN" : (winner === "Draw" ? "DRAW" : "LOSS"),
+    score: `${s1}-${s2}`,
+    date: new Date().toLocaleDateString()
+  };
+  history.unshift(newMatch);
+  history = history.slice(0, 5); // Keep last 5
+  localStorage.setItem("matchHistory", JSON.stringify(history));
+  renderMatchHistory();
+}
+
+function renderMatchHistory() {
+  const historyEl = document.getElementById("matchHistory");
+  if (!historyEl) return;
+  const history = JSON.parse(localStorage.getItem("matchHistory") || "[]");
+
+  if (history.length === 0) {
+    historyEl.innerHTML = '<p class="text-muted" style="font-size:0.7rem;">No battles yet...</p>';
+    return;
+  }
+
+  historyEl.innerHTML = history.map(m => `
+    <div class="stat-badge-mini" style="border-left: 3px solid ${m.result === 'WIN' ? '#22c55e' : (m.result === 'LOSS' ? '#ef4444' : '#94a3b8')}">
+      <span class="mini-name">${m.mode}</span>
+      <span class="mini-val">${m.score}</span>
+      <span class="mini-rank" style="font-size: 0.6rem;">${m.result}</span>
+    </div>
+  `).join('');
+}
+
 function handleGameOver(finalWinner) {
   stopTimer();
+  // Save result
+  saveMatchResult(finalWinner, score1Display.innerText, score2Display.innerText, isComputerMatch ? "SOLO" : "ONLINE");
   setTimeout(() => {
     document.getElementById("gameOverOverlay").style.display = "flex";
     const winnerText = document.getElementById("winner");
@@ -479,6 +526,27 @@ function toggleChat() {
   const chat = document.getElementById('chatSidebar');
   if (chat) chat.classList.toggle('active');
 }
+
+// Tutorial Logic
+function showTutorial() {
+  document.getElementById("tutorialOverlay").style.display = "flex";
+}
+
+function closeTutorial() {
+  document.getElementById("tutorialOverlay").style.display = "none";
+}
+
+// Initial Name Loading & First-time Tutorial
+window.addEventListener('DOMContentLoaded', () => {
+  renderMatchHistory(); // Load history
+  const savedName = localStorage.getItem("battleName");
+  if (savedName) {
+    document.getElementById("n1").value = savedName;
+  } else {
+    // New User: Show tutorial automatically
+    setTimeout(showTutorial, 1000);
+  }
+});
 
 function copyRoomCode() {
   if (!myRoomID) return;

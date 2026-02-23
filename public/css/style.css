@@ -156,11 +156,37 @@ h1:not(.main-title) {
     text-transform: uppercase;
     letter-spacing: 2px;
     box-shadow: 0 4px 15px rgba(240, 173, 78, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.btn-icon {
+    font-size: 1.2rem;
 }
 
 .lobby-actions .premium-btn {
-    margin-bottom: 1.5rem;
-    /* Increased space for lobby buttons */
+    margin-bottom: 0.75rem;
+}
+
+.lobby-group-title {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 1.5rem 0 0.75rem 0;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.lobby-group-title::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--glass-border);
 }
 
 #roomDisplay {
@@ -282,6 +308,29 @@ h1:not(.main-title) {
 .score-display {
     font-size: clamp(2.5rem, 10vw, 4rem);
     font-weight: 900;
+    transition: var(--transition);
+}
+
+.winner-flash {
+    animation: winner-pulse 0.6s ease-out;
+    color: var(--primary) !important;
+}
+
+@keyframes winner-pulse {
+    0% {
+        transform: scale(1);
+        text-shadow: 0 0 0px var(--primary-glow);
+    }
+
+    50% {
+        transform: scale(1.3);
+        text-shadow: 0 0 30px var(--primary);
+    }
+
+    100% {
+        transform: scale(1);
+        text-shadow: 0 0 0px var(--primary-glow);
+    }
 }
 
 /* Controls */
