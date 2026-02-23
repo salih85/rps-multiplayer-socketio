@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPC Multiplayer</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css">
+    <title>RPC Multiplayer | FIND THE CHAMP</title>
+    <!-- Premium Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/script.js" defer></script>
@@ -14,71 +15,85 @@
 
 <body>
 
-    <section id="gameSection" style="display: none;">
-        <div class="row mt-3 mb-5">
-            <div class="col-12">
-                <h1 class="text-center">FIND THE CHAMP</h1>
-                <p class="text-center text-muted" id="roomDisplay"></p>
-            </div>
-        </div>
-        <div class="row mb-5">
-            <div class="col-6 text-center">
-                <img src="/image/rock.png" alt="" id="i1" class="img-fluid" style="height: 160px;">
-                <div class="form-group mt-3">
-                    <h3 id="p1Name">Player 1</h3>
+    <!-- Main Game Section -->
+    <main id="gameSection" style="display: none;">
+        <header class="text-center mb-5">
+            <h1>FIND THE CHAMP</h1>
+            <p id="roomDisplay" class="text-muted"></p>
+        </header>
+
+        <div class="game-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <!-- Player One (You) -->
+            <div class="player-card glass-panel text-center" id="card1">
+                <h3 id="p1Name" class="text-gradient">Player 1</h3>
+                <div class="score-display" id="score1">0</div>
+                <img src="/image/rock.png" alt="Your Move" id="i1" class="player-img">
+
+                <div id="controls" class="choice-container">
+                    <button class="choice-btn" onclick="playerChoose('rock')">
+                        <img src="/image/rock.png" alt="Rock">
+                        <span>ROCK</span>
+                    </button>
+                    <button class="choice-btn" onclick="playerChoose('paper')">
+                        <img src="/image/paper.png" alt="Paper">
+                        <span>PAPER</span>
+                    </button>
+                    <button class="choice-btn" onclick="playerChoose('scissor')">
+                        <img src="/image/scissors.png" alt="Scissor">
+                        <span>SCISSOR</span>
+                    </button>
                 </div>
-                <h2 class="text-center" id="score1">0</h2>
-                <div id="controls">
-                    <button class="btn btn-outline-primary btn-choice" onclick="playerChoose('rock')">🪨 Rock</button>
-                    <button class="btn btn-outline-success btn-choice" onclick="playerChoose('paper')">📄 Paper</button>
-                    <button class="btn btn-outline-danger btn-choice" onclick="playerChoose('scissor')">✂️ Scissor</button>
-                </div>
             </div>
-            <div class="col-6 text-center">
-                <img src="/image/rock.png" alt="Opponent" id="i2" class="img-fluid" style="height: 160px;" />
-                <h3 class="text-center mt-3" id="p2Name">Waiting...</h3>
-                <h2 class="text-center" id="score2">0</h2>
-                <p id="opponentStatus" class="text-info">Waiting for opponent move...</p>
+
+            <!-- Player Two (Opponent) -->
+            <div class="player-card glass-panel text-center" id="card2">
+                <h3 id="p2Name" class="text-gradient">Opponent</h3>
+                <div class="score-display" id="score2">0</div>
+                <img src="/image/rock.png" alt="Opponent Move" id="i2" class="player-img">
+                <div class="status-box mt-4">
+                    <p id="opponentStatus" class="text-info">Waiting for opponent move...</p>
+                </div>
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-4 offset-4 mt-2">
-                <h4 class="text-center mt-3" id="currentRound">Round: 0/20</h4>
+        <footer class="text-center mt-5">
+            <div class="glass-panel" style="display: inline-block; padding: 1rem 3rem;">
+                <h4 id="currentRound">Round: 0/20</h4>
             </div>
-        </div>
-    </section>
+        </footer>
+    </main>
 
+    <!-- Welcome / Join Lobby Overlay -->
     <section id="overlay">
-        <div style="background-color: rgba(0,0,0,0.95); width: 100%; height: 100vh; position: absolute; top: 0; padding-top: 100px;">
-            <h1 class="text-center text-white mt-3">WELCOME</h1>
-            <h2 class="text-center text-info mt-3">ROCK PAPER SCISSOR CHAMP 2025</h2>
+        <div class="modal-content-custom glass-panel">
+            <h1>WELCOME</h1>
+            <h2 class="text-gradient mb-4">CHAMPIONS 2025</h2>
+            <div class="form-group mb-4">
+                <input type="text" id="n1" class="custom-input" placeholder="Enter Your Name">
+            </div>
+            <button class="premium-btn w-100" onclick="startGame()">JOIN LOBBY</button>
+        </div>
+    </section>
 
-            <div class="row mt-5 btn1">
-                <div class="col-12 col-md-6 col-lg-4 offset-md-3 offset-lg-4 form1">
-                    <div class="form-group mt-4">
-                        <input type="text" id="n1" class="text-align" placeholder="Enter Your Name">
-                    </div>
-                    <button class="btn btn-block btn-outline-warning mt-5 button" onclick="startGame()">JOIN LOBBY</button>
-                </div>
+    <!-- Matchmaking Overlay -->
+    <section id="waitingOverlay" style="display: none;">
+        <div class="modal-content-custom glass-panel">
+            <h1 class="mb-3">MATCHMAKING</h1>
+            <p class="text-muted mb-4">Searching for a worthy opponent...</p>
+            <div class="spinner-container">
+                <div class="spinner-border text-warning" style="width: 3rem; height: 3rem;"></div>
             </div>
         </div>
     </section>
 
-    <section id="waitingOverlay" style="display: none; background-color: rgba(0,0,0,0.95); width: 100%; height: 100vh; position: absolute; top: 0; padding-top: 200px;">
-        <h1 class="text-center text-white">MATCHMAKING...</h1>
-        <p class="text-center text-info mt-3">Searching for an opponent. Please wait.</p>
-        <div class="text-center mt-5">
-            <div class="spinner-border text-warning" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
+    <!-- Game Over Overlay -->
+    <section id="gameOverOverlay" style="display: none;">
+        <div class="modal-content-custom glass-panel">
+            <h1 id="winner" class="mb-5">GAME OVER</h1>
+            <button onclick="location.reload()" class="premium-btn">PLAY AGAIN</button>
         </div>
     </section>
 
-    <section class="text-center" id="gameOverOverlay" style="background-color: rgba(0, 0, 0, 0.95); width: 100%; height: 100vh; position: absolute; top: 0; padding-top: 40vh; display: none;">
-        <h1 class="text-center text-white mt-5" id="winner"></h1>
-        <button onclick="location.reload()" class="btn btn-outline-primary mt-5">PLAY AGAIN</button>
-    </section>
 </body>
 
 </html>
