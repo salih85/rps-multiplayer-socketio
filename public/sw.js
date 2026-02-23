@@ -3,6 +3,7 @@ const ASSETS = [
     '/',
     '/css/style.css?v=2.1',
     '/js/script.js?v=2.1',
+    'https://img.icons8.com/color/512/rock-paper-scissors.png',
     'https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap',
     'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js',
     '/sw.js?v=2.1'
