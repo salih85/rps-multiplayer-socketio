@@ -1,10 +1,11 @@
-const CACHE_NAME = 'battle-arena-v2'; // Bumped version
+const CACHE_NAME = 'battle-arena-v2.1'; // Bumped version again to clear cache
 const ASSETS = [
     '/',
-    '/css/style.css',
-    '/js/script.js',
+    '/css/style.css?v=2.1',
+    '/js/script.js?v=2.1',
     'https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap',
-    'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js'
+    'https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js',
+    '/sw.js?v=2.1'
 ];
 
 // Install Event - caching assets
@@ -33,14 +34,18 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// Fetch Event - Network-First strategy for better updates
+// Fetch Event - Network-First strategy
 self.addEventListener('fetch', (event) => {
-    // We want a Network-First strategy for our main scripts/styles to avoid stale cache issues
-    if (ASSETS.some(asset => event.request.url.includes(asset))) {
+    // Check if the request matches any of our ASSETS (ignoring query params if needed)
+    const isAsset = ASSETS.some(asset => {
+        const url = new URL(asset, self.location.origin);
+        return event.request.url.includes(url.pathname);
+    });
+
+    if (isAsset) {
         event.respondWith(
             fetch(event.request)
                 .then((response) => {
-                    // Update cache on successful fetch
                     const resClone = response.clone();
                     caches.open(CACHE_NAME).then(cache => cache.put(event.request, resClone));
                     return response;

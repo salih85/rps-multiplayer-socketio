@@ -15,16 +15,20 @@
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/js/script.js" defer></script>
-    <link rel="stylesheet" href="/css/style.css">
+    <script src="/js/script.js?v=2.1" defer></script>
+    <link rel="stylesheet" href="/css/style.css?v=2.1">
 
     <script>
+        // Force unregister all old Service Workers to clear the "sticky" broken cache
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(reg => {
-                    console.log('SW registered!', reg);
-                }).catch(err => {
-                    console.log('SW registration failed: ', err);
+            navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                for (let registration of registrations) {
+                    registration.unregister();
+                    console.log('Old SW unregistered');
+                }
+                // After unregistering, register the new one (busting cache by versioning sw.js if needed)
+                navigator.serviceWorker.register('/sw.js?v=2.1').then(reg => {
+                    console.log('New SW registered!', reg);
                 });
             });
         }

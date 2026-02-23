@@ -1,4 +1,10 @@
-const socket = io();
+let socket;
+try {
+  socket = io();
+} catch (e) {
+  console.error("Socket.io library (io) not found. Real-time features disabled.");
+  socket = { on: () => { }, emit: () => { } }; // Dummy socket to prevent errors
+}
 
 let myRoomID = null;
 let myPlayerIndex = null;
