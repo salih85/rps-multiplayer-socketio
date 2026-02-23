@@ -4,94 +4,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RPC Multiplayer | FIND THE CHAMP</title>
-    <!-- Premium Typography -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;800&display=swap" rel="stylesheet">
+    <title>BATTLE ARENA | Pro RPS Multiplayer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/script.js" defer></script>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 
-
 <body>
+ 
+    <audio id="sfx-click" src="https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3"
+        preload="auto"></audio>
+    <audio id="sfx-win" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3" preload="auto"></audio>
+    <audio id="sfx-lose" src="https://assets.mixkit.co/active_storage/sfx/2513/2513-preview.mp3" preload="auto"></audio>
+    <audio id="sfx-round" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"
+        preload="auto"></audio>
 
-    <!-- Main Game Section -->
+
     <main id="gameSection" style="display: none;">
         <header class="text-center mb-5">
-            <h1>FIND THE CHAMP</h1>
-            <p id="roomDisplay" class="text-muted"></p>
+            <h1>BATTLE ARENA</h1>
+            <div id="roomDisplay" class="glass-panel"
+                style="padding: 0.5rem 1.5rem; display: inline-block; font-family: monospace; letter-spacing: 2px;">
+                ROOM: ----</div>
         </header>
 
-        <div class="game-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-            <!-- Player One (You) -->
-            <div class="player-card glass-panel text-center" id="card1">
-                <h3 id="p1Name" class="text-gradient">Player 1</h3>
-                <div class="score-display" id="score1">0</div>
-                <img src="/image/rock.png" alt="Your Move" id="i1" class="player-img">
+        <div class="main-layout">
+            <div class="game-content">
+                <div class="game-grid">
+               
+                    <div class="player-card glass-panel text-center" id="card1">
+                        <div class="emote-display" id="emote1"></div>
+                        <h3 id="p1Name" class="text-gradient">YOU</h3>
+                        <div class="score-display" id="score1">0</div>
+                        <img src="/image/rock.png" alt="Your Move" id="i1" class="player-img">
 
-                <div id="controls" class="choice-container">
-                    <button class="choice-btn" onclick="playerChoose('rock')">
-                        <img src="/image/rock.png" alt="Rock">
-                        <span>ROCK</span>
-                    </button>
-                    <button class="choice-btn" onclick="playerChoose('paper')">
-                        <img src="/image/paper.png" alt="Paper">
-                        <span>PAPER</span>
-                    </button>
-                    <button class="choice-btn" onclick="playerChoose('scissor')">
-                        <img src="/image/scissors.png" alt="Scissor">
-                        <span>SCISSOR</span>
-                    </button>
+                        <div id="controls" class="choice-container">
+                            <button class="choice-btn" onclick="playerChoose('rock')">
+                                <img src="/image/rock.png" alt="Rock">
+                                <span>ROCK</span>
+                            </button>
+                            <button class="choice-btn" onclick="playerChoose('paper')">
+                                <img src="/image/paper.png" alt="Paper">
+                                <span>PAPER</span>
+                            </button>
+                            <button class="choice-btn" onclick="playerChoose('scissor')">
+                                <img src="/image/scissors.png" alt="Scissor">
+                                <span>SCISSOR</span>
+                            </button>
+                        </div>
+
+                        <div class="emote-bar mt-4">
+                            <button class="emote-btn" onclick="sendEmote('🔥')">🔥</button>
+                            <button class="emote-btn" onclick="sendEmote('👏')">👏</button>
+                            <button class="emote-btn" onclick="sendEmote('😎')">😎</button>
+                            <button class="emote-btn" onclick="sendEmote('😡')">😡</button>
+                        </div>
+                    </div>
+
+                 
+                    <div class="player-card glass-panel text-center" id="card2">
+                        <div class="emote-display" id="emote2"></div>
+                        <h3 id="p2Name" class="text-gradient">OPPONENT</h3>
+                        <div class="score-display" id="score2">0</div>
+                        <img src="/image/rock.png" alt="Opponent Move" id="i2" class="player-img">
+                        <div class="status-box mt-4">
+                            <p id="opponentStatus" class="text-info pulse-text">Waiting for opponent...</p>
+                        </div>
+                    </div>
                 </div>
+
+                <footer class="text-center mt-5">
+                    <div class="glass-panel"
+                        style="display: inline-block; padding: 0.75rem 2.5rem; border-radius: 50px;">
+                        <h4 id="currentRound" style="margin:0; font-weight: 800;">ROUND 0 / 20</h4>
+                    </div>
+                </footer>
             </div>
 
-            <!-- Player Two (Opponent) -->
-            <div class="player-card glass-panel text-center" id="card2">
-                <h3 id="p2Name" class="text-gradient">Opponent</h3>
-                <div class="score-display" id="score2">0</div>
-                <img src="/image/rock.png" alt="Opponent Move" id="i2" class="player-img">
-                <div class="status-box mt-4">
-                    <p id="opponentStatus" class="text-info">Waiting for opponent move...</p>
+
+            <aside class="chat-sidebar glass-panel">
+                <div class="chat-header">
+                    <h4 style="margin:0; letter-spacing: 1px;">💬 BATTLE CHAT</h4>
                 </div>
-            </div>
+                <div id="chatMessages" class="chat-body"></div>
+                <div class="chat-footer">
+                    <input type="text" id="chatInput" placeholder="Send a message..." class="custom-input">
+                    <button id="sendChatBtn" class="premium-btn" style="padding: 0 1.25rem;">➤</button>
+                </div>
+            </aside>
         </div>
-
-        <footer class="text-center mt-5">
-            <div class="glass-panel" style="display: inline-block; padding: 1rem 3rem;">
-                <h4 id="currentRound">Round: 0/20</h4>
-            </div>
-        </footer>
     </main>
 
-    <!-- Welcome / Join Lobby Overlay -->
+ 
     <section id="overlay">
-        <div class="modal-content-custom glass-panel">
-            <h1>WELCOME</h1>
-            <h2 class="text-gradient mb-4">CHAMPIONS 2025</h2>
-            <div class="form-group mb-4">
-                <input type="text" id="n1" class="custom-input" placeholder="Enter Your Name">
+        <div class="lobby-container">
+            <div class="row" style="display: flex; gap: 3rem; align-items: flex-start;">
+       
+                <div style="flex: 1; max-width: 500px;">
+                    <div class="modal-content-custom glass-panel p-5">
+                        <h1 class="mb-2">BATTLE ARENA</h1>
+                        <p class="text-muted mb-5">Master the ultimate Rock Paper Scissors</p>
+
+                        <div class="form-group mb-4">
+                            <input type="text" id="n1" class="custom-input" placeholder="Enter Your Battle Name">
+                        </div>
+
+                        <div class="d-flex" style="gap: 1rem; flex-direction: column;">
+                            <button class="premium-btn" onclick="startGame('quick')">QUICK PLAY</button>
+
+                            <div class="private-match-section">
+                                <p class="text-muted small mb-3">OR JOIN A PRIVATE MATCH</p>
+                                <div class="d-flex" style="gap: 0.5rem; margin-bottom: 1rem;">
+                                    <input type="text" id="roomCode" class="custom-input" placeholder="Enter Room Code"
+                                        style="text-align: center;">
+                                </div>
+                                <button class="premium-btn secondary-btn w-100" onclick="startGame('private')">JOIN
+                                    PRIVATE</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="flex: 1.5;">
+                    <div class="glass-panel h-100 p-5 lobby-stats"
+                        style="display: flex; flex-direction: column; gap: 3rem;">
+                        <div>
+                            <h3 class="text-gradient mb-4" style="font-weight: 900;">🏆 GLOBAL LEADERBOARD</h3>
+                            <div id="leaderboard" class="stats-list">
+                                <p class="text-muted">Analyzing champions...</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h3 class="text-gradient mb-4" style="font-weight: 900;">⚔️ RECENT BATTLES</h3>
+                            <div id="history" class="stats-list">
+                                <p class="text-muted">Fetching battle records...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button class="premium-btn w-100" onclick="startGame()">JOIN LOBBY</button>
         </div>
     </section>
 
-    <!-- Matchmaking Overlay -->
+ 
     <section id="waitingOverlay" style="display: none;">
         <div class="modal-content-custom glass-panel">
             <h1 class="mb-3">MATCHMAKING</h1>
-            <p class="text-muted mb-4">Searching for a worthy opponent...</p>
+            <p class="text-muted mb-5" id="waitingMsg">Searching for a worthy opponent...</p>
             <div class="spinner-container">
-                <div class="spinner-border text-warning" style="width: 3rem; height: 3rem;"></div>
+                <div class="spinner-border" style="width: 4rem; height: 4rem; border-width: 0.4rem;"></div>
             </div>
+            <button class="premium-btn secondary-btn mt-5" onclick="location.reload()">CANCEL</button>
         </div>
     </section>
 
-    <!-- Game Over Overlay -->
     <section id="gameOverOverlay" style="display: none;">
         <div class="modal-content-custom glass-panel">
-            <h1 id="winner" class="mb-5">GAME OVER</h1>
-            <button onclick="location.reload()" class="premium-btn">PLAY AGAIN</button>
+            <h2 class="text-muted mb-2">BATTLE COMPLETE</h2>
+            <h1 id="winner" class="mb-5">YOU WON!</h1>
+            <button onclick="location.reload()" class="premium-btn w-100">RETURN TO LOBBY</button>
         </div>
     </section>
 
