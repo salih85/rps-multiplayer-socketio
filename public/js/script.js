@@ -542,8 +542,8 @@ window.addEventListener('DOMContentLoaded', () => {
   const savedName = localStorage.getItem("battleName");
   if (savedName) {
     document.getElementById("n1").value = savedName;
-  } else {
-  });
+  }
+});
 
 // PWA Install Logic
 let deferredPrompt;
