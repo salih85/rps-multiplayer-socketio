@@ -8,14 +8,13 @@ module.exports = (io) => {
 
         const sendLobbyData = async () => {
             try {
-                const recentGames = await Game.find().sort({ date: -1 }).limit(10);
                 const leaderboard = await Game.aggregate([
                     { $group: { _id: "$winner", wins: { $sum: 1 } } },
                     { $match: { _id: { $ne: "Draw" } } },
                     { $sort: { wins: -1 } },
                     { $limit: 10 }
                 ]);
-                socket.emit('lobby-data', { recentGames, leaderboard });
+                socket.emit('lobby-data', { leaderboard });
             } catch (err) {
                 console.error('Error fetching lobby data:', err);
             }
@@ -27,7 +26,6 @@ module.exports = (io) => {
             let targetRoomID = roomID;
 
             if (targetRoomID) {
-              
                 if (!rooms[targetRoomID]) {
                     rooms[targetRoomID] = { players: [], round: 0, maxRounds: 20, isPrivate: true };
                 }
@@ -37,7 +35,6 @@ module.exports = (io) => {
                     return;
                 }
             } else {
-         
                 for (let id in rooms) {
                     if (!rooms[id].isPrivate && rooms[id].players.length === 1) {
                         targetRoomID = id;
@@ -131,6 +128,7 @@ module.exports = (io) => {
         });
 
         socket.on('disconnect', () => {
+            console.log('User disconnected:', socket.id);
             for (let roomID in rooms) {
                 const room = rooms[roomID];
                 const index = room.players.findIndex(p => p.id === socket.id);
