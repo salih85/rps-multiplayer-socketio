@@ -1,0 +1,18 @@
+{
+    "name": "BATTLE ARENA: Pro RPS",
+    "short_name": "Battle Arena",
+    "description": "High-fidelity rock-paper-scissors multiplayer battle arena.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#0f172a",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "https://cdn-icons-png.flaticon.com/512/1041/1041916.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "any maskable"
+        }
+    ]
+}

@@ -7,10 +7,28 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>BATTLE ARENA | Pro RPS Multiplayer</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <!-- PWA & Mobile Meta -->
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/1041/1041916.png">
+
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/script.js" defer></script>
     <link rel="stylesheet" href="/css/style.css">
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').then(reg => {
+                    console.log('SW registered!', reg);
+                }).catch(err => {
+                    console.log('SW registration failed: ', err);
+                });
+            });
+        }
+    </script>
 </head>
 
 <body>
@@ -114,6 +132,12 @@
         <div class="lobby-container">
             <div class="modal-content-custom glass-panel p-5">
                 <h1 class="main-title mb-4">BATTLE ARENA</h1>
+
+                <!-- PWA Install Button (Hidden by default) -->
+                <button id="pwaInstallBtn" class="premium-btn w-100 mb-4"
+                    style="display: none; background: var(--premium-accent); border: 1px solid rgba(255,255,255,0.2);">
+                    <span class="btn-icon">📥</span> INSTALL APP
+                </button>
 
                 <div class="form-group mb-3">
                     <input type="text" id="n1" class="custom-input" placeholder="Enter Battle Name">
