@@ -11,6 +11,7 @@
     <!-- PWA & Mobile Meta -->
     <meta name="theme-color" content="#0f172a">
     <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="/image/rock.png">
     <link rel="apple-touch-icon" href="/image/rock.png">
 
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
@@ -21,11 +22,33 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js?v=2.1').then(reg => {
+                navigator.serviceWorker.register('/sw.js?v=2.2').then(reg => {
                     console.log('SW Registered!', reg);
+
+                    // Check for updates every time page is loaded
+                    reg.update();
+
+                    reg.onupdatefound = () => {
+                        const newWorker = reg.installing;
+                        newWorker.onstatechange = () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // New worker is ready, it will skipWaiting and claim automatically
+                                console.log('New update available, reloading...');
+                            }
+                        };
+                    };
                 }).catch(err => {
                     console.log('SW Registration failed: ', err);
                 });
+            });
+
+            // Refresh the page automatically when the new service worker takes over
+            let refreshing = false;
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (!refreshing) {
+                    window.location.reload();
+                    refreshing = true;
+                }
             });
         }
     </script>

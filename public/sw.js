@@ -1,4 +1,4 @@
-const CACHE_NAME = 'battle-arena-v2.1'; // Bumped version again to clear cache
+const CACHE_NAME = 'battle-arena-v2.2'; // Bumped version to force update
 const ASSETS = [
     '/',
     '/css/style.css?v=2.1',
