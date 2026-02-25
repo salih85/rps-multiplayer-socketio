@@ -9,13 +9,13 @@
     "orientation": "portrait",
     "icons": [
         {
-            "src": "/image/rock.png",
+            "src": "/image/phone.png",
             "type": "image/png",
             "sizes": "192x192",
             "purpose": "any maskable"
         },
         {
-            "src": "/image/rock.png",
+            "src": "/image/phone.png",
             "type": "image/png",
             "sizes": "512x512",
             "purpose": "any maskable"

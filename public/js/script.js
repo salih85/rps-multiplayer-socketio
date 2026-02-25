@@ -27,6 +27,8 @@ const sfxWin = document.getElementById("sfx-win");
 const sfxLose = document.getElementById("sfx-lose");
 const sfxRound = document.getElementById("sfx-round");
 
+
+
 const attacks = {
   rock: "/image/rock.png",
   paper: "/image/paper.png",
@@ -40,10 +42,16 @@ function playSFX(sfx) {
   }
 }
 
-let isComputerMatch = false;
+let soloScores = [0, 0];
+let soloRound = 0;
 
 function startComputerGame() {
   isComputerMatch = true;
+  soloScores = [0, 0];
+  soloRound = 0;
+  score1Display.innerText = "0";
+  score2Display.innerText = "0";
+  roundDisplay.innerText = "ROUND 0 / 10";
   myName = document.getElementById("n1").value.trim() || "PLAYER";
   localStorage.setItem("battleName", myName); // Save name
   document.getElementById("overlay").style.display = "none";
@@ -286,15 +294,15 @@ function handleChoiceLocal(myChoice) {
       }
     }
 
-    const currentScores = [parseInt(score1Display.innerText), parseInt(score2Display.innerText)];
-    if (winner === 0) currentScores[0]++;
-    if (winner === 1) currentScores[1]++;
+    if (winner === 0) soloScores[0]++;
+    if (winner === 1) soloScores[1]++;
+    soloRound++;
 
     handleResult({
       choices: [myChoice, aiChoice],
       winner,
-      scores: currentScores,
-      round: parseInt(roundDisplay.innerText.match(/\d+/)[0]) + 1
+      scores: [...soloScores],
+      round: soloRound
     });
   }, 1000);
 }
@@ -306,13 +314,17 @@ function handleResult({ choices, winner, scores, round }) {
   vibrate(100);
   stopTimer();
 
-  let p1Choice, p2Choice;
+  let s1, s2;
   if (isComputerMatch) {
     p1Choice = choices[0];
     p2Choice = choices[1];
+    s1 = scores[0];
+    s2 = scores[1];
   } else {
     p1Choice = (myPlayerIndex === 0) ? choices[0] : choices[1];
     p2Choice = (myPlayerIndex === 0) ? choices[1] : choices[0];
+    s1 = (myPlayerIndex === 0) ? scores[0] : scores[1];
+    s2 = (myPlayerIndex === 0) ? scores[1] : scores[0];
   }
 
   i1.src = attacks[p1Choice];
@@ -355,13 +367,13 @@ function handleResult({ choices, winner, scores, round }) {
     setTimeout(() => score2Display.classList.remove("winner-flash"), 600);
   }
 
-  animateValue(score1Display, parseInt(score1Display.innerText), scores[0], 500);
-  animateValue(score2Display, parseInt(score2Display.innerText), scores[1], 500);
+  animateValue(score1Display, parseInt(score1Display.innerText) || 0, s1, 500);
+  animateValue(score2Display, parseInt(score2Display.innerText) || 0, s2, 500);
 
-  roundDisplay.innerText = `ROUND ${round} / 20`;
+  roundDisplay.innerText = `ROUND ${round} / 10`;
 
   setTimeout(() => {
-    if (round < 20) {
+    if (round < 10) {
       resetUI();
       startTimer();
     } else {
@@ -514,7 +526,16 @@ socket.on('receive-chat', ({ message, sender, time }) => {
 });
 
 function sendEmote(emote) {
-  socket.emit('send-emote', { roomID: myRoomID, emote, senderIndex: myPlayerIndex });
+  if (isComputerMatch) {
+    // Local display for Solo mode
+    const display = document.getElementById("emote1");
+    display.innerText = emote;
+    display.classList.remove("float-up");
+    void display.offsetWidth;
+    display.classList.add("float-up");
+  } else {
+    socket.emit('send-emote', { roomID: myRoomID, emote, senderIndex: myPlayerIndex });
+  }
   playSFX(sfxClick);
 }
 

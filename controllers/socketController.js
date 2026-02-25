@@ -1,6 +1,6 @@
 const Game = require('../models/Game');
 
-let rooms = {}; // { roomID: { players: [{id, name, choice, score}], round: 0, maxRounds: 20, isPrivate: boolean } }
+let rooms = {}; // { roomID: { players: [{id, name, choice, score}], round: 0, maxRounds: 10, isPrivate: boolean } }
 
 module.exports = (io) => {
     io.on('connection', async (socket) => {
@@ -27,7 +27,7 @@ module.exports = (io) => {
 
             if (targetRoomID) {
                 if (!rooms[targetRoomID]) {
-                    rooms[targetRoomID] = { players: [], round: 0, maxRounds: 20, isPrivate: true };
+                    rooms[targetRoomID] = { players: [], round: 0, maxRounds: 10, isPrivate: true };
                 }
 
                 if (rooms[targetRoomID].players.length >= 2) {
@@ -44,7 +44,7 @@ module.exports = (io) => {
 
                 if (!targetRoomID) {
                     targetRoomID = Math.random().toString(36).substring(7).toUpperCase();
-                    rooms[targetRoomID] = { players: [], round: 0, maxRounds: 20, isPrivate: false };
+                    rooms[targetRoomID] = { players: [], round: 0, maxRounds: 10, isPrivate: false };
                 }
             }
 
