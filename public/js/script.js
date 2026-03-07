@@ -3,7 +3,7 @@ try {
   socket = io();
 } catch (e) {
   console.error("Socket.io library (io) not found. Real-time features disabled.");
-  socket = { on: () => { }, emit: () => { } }; // Dummy socket to prevent errors
+  socket = { on: () => { }, emit: () => { } }; 
 }
 
 let myRoomID = null;
@@ -35,8 +35,16 @@ const attacks = {
   scissor: "/image/scissors.png"
 };
 
+let soundEnabled = true;
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  const btn = document.getElementById("soundToggle");
+  if (btn) btn.innerText = soundEnabled ? "🔊 ON" : "🌑 OFF";
+  playSFX(sfxClick);
+}
+
 function playSFX(sfx) {
-  if (sfx) {
+  if (sfx && soundEnabled) {
     sfx.currentTime = 0;
     sfx.play().catch(e => console.log("Audio play blocked"));
   }
@@ -53,12 +61,12 @@ function startComputerGame() {
   score2Display.innerText = "0";
   roundDisplay.innerText = "ROUND 0 / 10";
   myName = document.getElementById("n1").value.trim() || "PLAYER";
-  localStorage.setItem("battleName", myName); // Save name
+  localStorage.setItem("battleName", myName); 
   document.getElementById("overlay").style.display = "none";
   document.getElementById("gameSection").style.display = "flex";
   document.getElementById("roomDisplay").querySelector("span").innerText = "MODE: VS COMPUTER";
 
-  // Hide chat for computer matches
+ 
   const chatSidebar = document.getElementById("chatSidebar");
   const mainLayout = document.querySelector(".main-layout");
   if (chatSidebar) chatSidebar.style.display = "none";
@@ -84,15 +92,15 @@ function startGame(mode) {
     alert("Please enter your name!");
     return;
   }
-  localStorage.setItem("battleName", myName); // Save name
+  localStorage.setItem("battleName", myName); 
 
-  // Restore chat for online matches
+
   const chatSidebar = document.getElementById("chatSidebar");
   const mainLayout = document.querySelector(".main-layout");
   if (chatSidebar) chatSidebar.style.display = "flex";
   if (mainLayout) mainLayout.style.gridTemplateColumns = "1fr 300px";
 
-  // Mobile specific: reset layout might be needed if desktop grid was changed
+ 
   if (window.innerWidth <= 768) {
     if (mainLayout) mainLayout.style.display = "flex";
     if (mainLayout) mainLayout.style.flexDirection = "column";
@@ -140,7 +148,7 @@ socket.on('lobby-data', ({ leaderboard }) => {
 let myStreak = 0;
 let opponentStreak = 0;
 let matchTimer = null;
-const TIMER_DURATION = 10; // seconds
+const TIMER_DURATION = 10; 
 
 function vibrate(ms) {
   if (navigator.vibrate) navigator.vibrate(ms);
@@ -151,7 +159,7 @@ function updateAvatar(elId, name) {
   if (!el) return;
   const initial = name ? name.charAt(0).toUpperCase() : "?";
   el.innerText = initial;
-  // Generate a consistent color based on name
+ 
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
@@ -200,7 +208,7 @@ function stopTimer() {
   const bar1 = document.getElementById("timer1");
   const bar2 = document.getElementById("timer2");
   if (bar1) {
-    bar1.style.transform = "scaleX(0)"; // Collapse on stop
+    bar1.style.transform = "scaleX(0)";
     bar1.style.webkitTransform = "scaleX(0)";
   }
   if (bar2) {
@@ -237,13 +245,36 @@ function updateStreakUI() {
   const s2 = document.getElementById("streak2");
   if (s1) {
     s1.innerText = `STREAK: ${myStreak}`;
-    if (myStreak >= 3) card1.classList.add("flaming-card");
-    else card1.classList.remove("flaming-card");
+    if (opponentStreak >= 3) {
+      card2.classList.add("flaming-card");
+      score2Display.classList.add("streak-glow");
+    } else {
+      card2.classList.remove("flaming-card");
+      score2Display.classList.remove("streak-glow");
+    }
+
+    if (myStreak >= 3) {
+      card1.classList.add("flaming-card");
+      score1Display.classList.add("streak-glow");
+    } else {
+      card1.classList.remove("flaming-card");
+      score1Display.classList.remove("streak-glow");
+    }
   }
-  if (s2) {
-    s2.innerText = `STREAK: ${opponentStreak}`;
-    if (opponentStreak >= 3) card2.classList.add("flaming-card");
-    else card2.classList.remove("flaming-card");
+}
+
+function updateMoveHistory(p1Choice, p2Choice) {
+  const historyEl = document.getElementById("moveHistory");
+  if (!historyEl) return;
+
+  const moveMap = { rock: "✊", paper: "✋", scissor: "✌️" };
+  const item = document.createElement("div");
+  item.className = "history-item";
+  item.innerHTML = `You: ${moveMap[p1Choice]} vs ${moveMap[p2Choice]}`;
+
+  historyEl.prepend(item);
+  if (historyEl.children.length > 3) {
+    historyEl.removeChild(historyEl.lastChild);
   }
 }
 
@@ -281,16 +312,16 @@ function handleChoiceLocal(myChoice) {
   const aiChoice = moves[Math.floor(Math.random() * 3)];
 
   setTimeout(() => {
-    let winner = -1; // Draw
+    let winner = -1; 
     if (myChoice !== aiChoice) {
       if (
         (myChoice === 'rock' && aiChoice === 'scissor') ||
         (myChoice === 'scissor' && aiChoice === 'paper') ||
         (myChoice === 'paper' && aiChoice === 'rock')
       ) {
-        winner = 0; // Player Wins
+        winner = 0; 
       } else {
-        winner = 1; // AI Wins
+        winner = 1; 
       }
     }
 
@@ -370,6 +401,16 @@ function handleResult({ choices, winner, scores, round }) {
   animateValue(score1Display, parseInt(score1Display.innerText) || 0, s1, 500);
   animateValue(score2Display, parseInt(score2Display.innerText) || 0, s2, 500);
 
+  updateMoveHistory(p1Choice, p2Choice);
+
+  // Trigger pop animation
+  score1Display.classList.add("score-pop");
+  score2Display.classList.add("score-pop");
+  setTimeout(() => {
+    score1Display.classList.remove("score-pop");
+    score2Display.classList.remove("score-pop");
+  }, 400);
+
   roundDisplay.innerText = `ROUND ${round} / 10`;
 
   setTimeout(() => {
@@ -425,7 +466,7 @@ function renderMatchHistory() {
 
 function handleGameOver(finalWinner) {
   stopTimer();
-  // Save result
+
   saveMatchResult(finalWinner, score1Display.innerText, score2Display.innerText, isComputerMatch ? "SOLO" : "ONLINE");
   setTimeout(() => {
     document.getElementById("gameOverOverlay").style.display = "flex";
@@ -446,7 +487,7 @@ function handleGameOver(finalWinner) {
       });
     } else {
       winnerText.innerText = "YOU WERE DEFEATED";
-      playSFX(sfxLose);
+      
     }
   }, 1500);
 }
@@ -527,7 +568,7 @@ socket.on('receive-chat', ({ message, sender, time }) => {
 
 function sendEmote(emote) {
   if (isComputerMatch) {
-    // Local display for Solo mode
+   
     const display = document.getElementById("emote1");
     display.innerText = emote;
     display.classList.remove("float-up");
@@ -577,21 +618,21 @@ let deferredPrompt;
 const installBtn = document.getElementById('pwaInstallBtn');
 
 window.addEventListener('beforeinstallprompt', (e) => {
-  // Prevent Chrome 67 and earlier from automatically showing the prompt
+ 
   e.preventDefault();
-  // Stash the event so it can be triggered later.
+ 
   deferredPrompt = e;
-  // Update UI to notify the user they can add to home screen
+ 
   if (installBtn) installBtn.style.display = 'flex';
 });
 
 if (installBtn) {
   installBtn.addEventListener('click', (e) => {
-    // hide our install button
+ 
     installBtn.style.display = 'none';
-    // Show the prompt
+ 
     deferredPrompt.prompt();
-    // Wait for the user to respond to the prompt
+  
     deferredPrompt.userChoice.then((choiceResult) => {
       if (choiceResult.outcome === 'accepted') {
         console.log('User accepted the A2HS prompt');

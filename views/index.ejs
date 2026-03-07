@@ -8,7 +8,7 @@
     <title>BATTLE ARENA | Pro RPS Multiplayer</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 
-    <!-- PWA & Mobile Meta -->
+
     <meta name="theme-color" content="#0f172a">
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" type="image/png" href="/image/rock.png">
@@ -25,14 +25,14 @@
                 navigator.serviceWorker.register('/sw.js?v=2.2').then(reg => {
                     console.log('SW Registered!', reg);
 
-                    // Check for updates every time page is loaded
+                  
                     reg.update();
 
                     reg.onupdatefound = () => {
                         const newWorker = reg.installing;
                         newWorker.onstatechange = () => {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                // New worker is ready, it will skipWaiting and claim automatically
+                                
                                 console.log('New update available, reloading...');
                             }
                         };
@@ -42,7 +42,7 @@
                 });
             });
 
-            // Refresh the page automatically when the new service worker takes over
+          
             let refreshing = false;
             navigator.serviceWorker.addEventListener('controllerchange', () => {
                 if (!refreshing) {
@@ -71,6 +71,7 @@
                     <span>ROOM: ----</span>
                     <i id="copyIcon">📋</i>
                 </div>
+                <button id="soundToggle" class="sound-toggle" onclick="toggleSound()">🔊 ON</button>
             </div>
         </header>
 
@@ -132,6 +133,10 @@
                         <div class="streak-badge" id="streak2">STREAK: 0</div>
                         <img src="/image/rock.png" alt="Opponent Move" id="i2" class="player-img">
                     </div>
+                </div>
+
+                <div id="moveHistory" class="move-history-bar">
+                   
                 </div>
 
                 <footer class="game-footer text-center">
@@ -203,7 +208,7 @@
                     <div class="compact-leaderboard mt-4">
                         <p class="text-muted small mb-2">📜 RECENT BATTLES</p>
                         <div id="matchHistory" class="stat-grid-mini">
-                            <!-- Match history injected here -->
+                           
                         </div>
                     </div>
 
@@ -234,7 +239,7 @@
         </div>
     </section>
 
-    <!-- NEW: Tutorial Modal -->
+ 
     <section id="tutorialOverlay" style="display: none;">
         <div class="modal-content-custom glass-panel">
             <h1 class="main-title mb-3">HOW TO PLAY</h1>

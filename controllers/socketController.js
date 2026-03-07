@@ -1,6 +1,6 @@
 const Game = require('../models/Game');
 
-let rooms = {}; // { roomID: { players: [{id, name, choice, score}], round: 0, maxRounds: 10, isPrivate: boolean } }
+let rooms = {}; 
 
 module.exports = (io) => {
     io.on('connection', async (socket) => {

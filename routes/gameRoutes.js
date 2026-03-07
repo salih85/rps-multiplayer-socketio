@@ -4,4 +4,5 @@ const gameController = require('../controllers/gameController');
 
 router.get('/', gameController.renderIndex);
 
+
 module.exports = router;
