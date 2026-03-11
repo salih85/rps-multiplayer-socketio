@@ -4,6 +4,7 @@ A modern, real-time multiplayer Rock Paper Scissors web game with a premium neon
 
 ## 🚀 Features
 
+
 - **🤖 Solo Play:** Practice your skills against a computer AI.
 - **🌐 Quick Matchmaking:** Instantly find random opponents online to battle in 10-round matches.
 - **🔑 Private Arenas:** Play with friends using custom secure room codes.
